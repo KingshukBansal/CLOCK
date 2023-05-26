@@ -5,9 +5,36 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>THE CLOCK</title>
 </head>
 <body>
+    <div id="time"></div>
     
+    <script>
+        const obj={weekday:"long",year:'numeric',month:'long',day:'numeric'};
+        let date=new Date();
+        let h=date.getHours();
+        let m=date.getMinutes();
+        let s=date.getSeconds();
+        let day=date.toLocaleDateString(undefined,obj);
+        let d=document.getElementById('time');
+        setInterval(()=>{
+            date=new Date();
+            h=date.getHours();
+         m=date.getMinutes();
+         s=date.getSeconds();
+         day=date.toLocaleDateString(undefined,obj);
+         if(s<=9){
+
+             d.innerHTML=h+':'+m+':0'+s+" on "+day;
+         }
+         else{
+
+             d.innerHTML=h+':'+m+':'+s+" on "+day;
+         }
+
+
+        },1000)
+    </script>
 </body>
 </html>
