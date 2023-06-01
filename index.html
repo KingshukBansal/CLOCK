@@ -1,40 +1,161 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>THE CLOCK</title>
-</head>
-<body>
-    <div id="time"></div>
-    
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body>
+    <div id="time" class="my-4 text-align-centre"></div>
+    <div class="container">
+      <div class="mb-3">
+        <label for="exampleInputEmail1" class="form-label">Task</label>
+        <input
+          type="email"
+          id="task"
+          class="form-control"
+          id="exampleInputEmail1"
+          aria-describedby="emailHelp"
+        />
+        <div id="emailHelp" class="form-text">
+          Enter the task you want to do in future.
+        </div>
+      </div>
+      <div class="mb-3">
+        <label for="exampleInputPassword1" class="form-label"
+          >Description</label
+        >
+        <input
+          type="text"
+          id="Description"
+          class="form-control"
+          id="exampleInputPassword1"
+        />
+      </div>
+
+      <button type="submit" id="add" class="btn btn-primary">ADD</button>
+    </div>
+    <div class="container2">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Task</th>
+            <th scope="col">Description</th>
+            <th scope="col"></th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody id="tbod"></tbody>
+      </table>
+    </div>
     <script>
-        const obj={weekday:"long",year:'numeric',month:'long',day:'numeric'};
-        let date=new Date();
-        let h=date.getHours();
-        let m=date.getMinutes();
-        let s=date.getSeconds();
-        let day=date.toLocaleDateString(undefined,obj);
-        let d=document.getElementById('time');
-        setInterval(()=>{
-            date=new Date();
-            h=date.getHours();
-         m=date.getMinutes();
-         s=date.getSeconds();
-         day=date.toLocaleDateString(undefined,obj);
-         if(s<=9){
+      const obj = {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      };
+      let date = new Date();
+      let h = date.getHours();
+      let m = date.getMinutes();
+      let s = date.getSeconds();
+      let day = date.toLocaleDateString(undefined, obj);
+      let d = document.getElementById("time");
+      let add = document.getElementById("add");
+      let task;
+      let description;
+      let tables;
+      let Id = 2;
+      let itemjsonarray = [];
+      function update() {
+        let str = "";
+        task = document.getElementById("task").value;
+        description = document.getElementById("Description").value;
+        if (!localStorage.getItem("itemJson")) {
+          itemjsonarray = [];
+          if (task && description) {
+            itemjsonarray.push([task, description]);
+          }
+          localStorage.setItem("itemJson", JSON.stringify(itemjsonarray));
+        } else {
+          itemjsonarray = JSON.parse(localStorage.getItem("itemJson"));
+          if (task && description) {
+            itemjsonarray.push([task, description]);
+          }
+          localStorage.setItem("itemJson", JSON.stringify(itemjsonarray));
+        }
+        tables = document.getElementById("tbod");
+        itemjsonarray.forEach((element, index) => {
+          str += ` <tr>
+                <th scope="row" class="index">${index + 1}</th>
+                <td>${element[0]}</td>
+                <td>${element[1]}</td>
+                <td><button   onclick="Delete(${index})" class="delete btn btn-primary ">Delete</button></td>
+                <td><button   onclick="Replace(${index})" class="replace btn btn-primary ">Replace</button></td>
+              </tr>`;
+        });
+        tables.innerHTML = str;
+        document.getElementById("task").value = " ";
+        document.getElementById("Description").value = " ";
+      }
+      function Delete(index) {
+        itemjsonarraystr = localStorage.getItem("itemJson");
+        itemjsonarray = JSON.parse(itemjsonarraystr);
+        itemjsonarray.splice(index, 1);
 
-             d.innerHTML=h+':'+m+':0'+s+" on "+day;
-         }
-         else{
+        itemjsonarraystr = JSON.stringify(itemjsonarray);
+        localStorage.setItem("itemJson", itemjsonarraystr);
 
-             d.innerHTML=h+':'+m+':'+s+" on "+day;
-         }
+        update();
+      }
+      function Replace(index) {
+        console.log(index);
+        task = document.getElementById("task").value;
+        description = document.getElementById("Description").value;
+        console.log(task);
+        itemjsonarray = JSON.parse(localStorage.getItem("itemJson"));
+        if (task && description) {
+          itemjsonarray[index] = [task, description];
+        } else {
+          alert("Please fill the required details");
+        }
+        localStorage.setItem("itemJson", JSON.stringify(itemjsonarray));
+        document.getElementById("task").value = " ";
+        document.getElementById("Description").value = " ";
 
-
-        },1000)
+        update();
+        let date = new Date();
+        h = date.getHours();
+        m = date.getMinutes();
+        s = date.getSeconds();
+        alert("Your Task is replaced at:"+h+":"+m+":"+s)
+      }
+      update();
+      add.addEventListener("click", update);
+      setInterval(() => {
+        date = new Date();
+        h = date.getHours();
+        m = date.getMinutes();
+        s = date.getSeconds();
+        day = date.toLocaleDateString(undefined, obj);
+        if (s <= 9) {
+          d.innerHTML = h + ":" + m + ":0" + s + " on " + day;
+        } else {
+          d.innerHTML = h + ":" + m + ":" + s + " on " + day;
+        }
+      }, 1000);
     </script>
-</body>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
+      crossorigin="anonymous"
+    ></script>
+  </body>
 </html>
